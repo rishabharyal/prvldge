@@ -43,7 +43,11 @@ class Token {
 
     public function generateToken(): string
     {
-        return $this->setRandomNumberCount()->generateRandomStringByRandomNumberCount()->combileRawTokenWithUniqId()->convertToHash()->getToken();
+        return $this->setRandomNumberCount()
+            ->generateRandomStringByRandomNumberCount()
+                ->combileRawTokenWithUniqId()
+                    ->convertToHash()
+                        ->getToken();
     }
 
     private function getToken(): string
