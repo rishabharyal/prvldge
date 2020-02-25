@@ -21,6 +21,8 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
+$app->configure('filesystems');
+
 $app->withFacades();
 
 $app->withEloquent();
@@ -78,7 +80,12 @@ $app->singleton(
 
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
+$app->register(\App\Providers\DetectServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+
+
+class_alias(\App\Support\Facades\DetectFacade::class, 'Detect');
 
 /*
 |--------------------------------------------------------------------------

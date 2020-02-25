@@ -7,7 +7,10 @@
     "require": {
         "php": "^7.2",
         "illuminate/redis": "^6.11",
+        "laravel/airlock": "^0.2.1",
         "laravel/lumen-framework": "^6.0",
+        "league/flysystem": "^1.0",
+        "league/flysystem-aws-s3-v3": "^1.0",
         "predis/predis": "^1.1"
     },
     "require-dev": {

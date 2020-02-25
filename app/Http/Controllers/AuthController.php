@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Detect\Detect;
 use App\Services\Token;
 use App\User;
 use Illuminate\Http\Request;
@@ -21,6 +22,13 @@ class AuthController extends Controller
     }
 
     public function register(Request $request) {
+
+        if (!$this->isRequestAllowedToProceed($request)) {
+            return response()->json([
+                'status' => 'NOT_ALLOWED'
+            ], 401);
+        }
+
         $this->validate($request, [
             'username' => 'required|unique:users,username',
             'password' => 'required|min:6',
@@ -43,10 +51,20 @@ class AuthController extends Controller
     }
 
     public function login(Request $request, $new = false) {
+
+        if (!$this->isRequestAllowedToProceed($request)) {
+            return response()->json([
+                'status' => 'NOT_ALLOWED'
+            ], 401);
+        }
+
+
         $this->validate($request, [
             'username' => 'required',
             'password' => 'required'
         ]);
+
+        // We only allow user agent from two sources: iOS & Android for now
 
         $username = $request->get('username');
 
@@ -68,10 +86,8 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = (new Token($user->id))->generateToken();
 
-        $user->access_token = $token;
-        $user->save();
+        $token = $user->createToken();
 
         return response()->json([
             'access_token' => $token,
@@ -80,6 +96,14 @@ class AuthController extends Controller
             'new' => $new
         ]);
 
+    }
+
+    private function isRequestAllowedToProceed(Request $request) {
+        if ($request->server('HTTP_USER_AGENT') === 'MemoryTest') {
+            return true;
+        }
+
+        return true;
     }
 
 }
