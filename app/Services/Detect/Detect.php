@@ -2,9 +2,7 @@
 
 namespace App\Services\Detect;
 
-use App\Services\Detect\Contracts\DetectInterface;
-
-class Detect implements DetectInterface {
+class Detect {
 
     private $location;
 
