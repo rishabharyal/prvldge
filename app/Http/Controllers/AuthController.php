@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Detect\Detect;
 use App\Services\Token;
 use App\Traits\NormallyUsedMethods;
 use App\User;

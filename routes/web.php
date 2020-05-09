@@ -13,10 +13,10 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function() {
-    return 'Welcome';
+    return view('welcome');
 });
-Route::post('/login', 'AuthController@login')->middleware('guest');
-Route::post('/register', 'AuthController@register')->middleware('guest');
+Route::post('/login', 'AuthController@login');
+Route::post('/register', 'AuthController@register');
 Route::post('/phone/check-availability', 'AuthController@checkPhone');
 
 Route::group(['middleware' => 'auth'], static function($router) {
