@@ -2,8 +2,23 @@
 namespace App\Traits;
 
 use App\UserRelationships;
+use Illuminate\Http\Request;
 
 trait NormallyUsedMethods {
+
+    /**
+     * @param null $agent
+     * @return bool
+     */
+    private function isRequestAllowedToProceed($agent = null): bool
+    {
+        if ($agent === 'MemoryTest') {
+            return true;
+        }
+
+        return true;
+    }
+
 
     /**
      * @param $firstId

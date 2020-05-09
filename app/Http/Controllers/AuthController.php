@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\Detect\Detect;
 use App\Services\Token;
+use App\Traits\NormallyUsedMethods;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +12,9 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
+    use NormallyUsedMethods;
+
     /**
      * Create a new controller instance.
      *
@@ -21,12 +25,47 @@ class AuthController extends Controller
         //
     }
 
+    public function checkPhone(Request $request) {
+        $phone = $request->get('phone_number');
+        $code = $request->get('prefix_code');
+
+        if (!in_array($code, ['977'], false)) {
+            return response()->json([
+                'status' => 'INVALID_PREFIX_CODE',
+                'success' => false
+            ]);
+        }
+
+        if (strlen($phone) !== 10) {
+            return response()->json([
+                'status' => 'INVALID_PHONE_NUMBER',
+                'success' => false
+            ]);
+        }
+
+        $userWIthGivenPhoneNumber = User::where('phone_number', $phone)->first();
+
+        if ($userWIthGivenPhoneNumber) {
+            return response()->json([
+                'status' => 'PHONE_NUMBER_ALREADY_EXISTS',
+                'success' => false
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'AVAILABLE',
+            'success' => true
+        ]);
+
+    }
+
     public function register(Request $request) {
 
-        if (!$this->isRequestAllowedToProceed($request)) {
+        if (!$this->isRequestAllowedToProceed($request->server('HTTP_USER_AGENT'))) {
             return response()->json([
-                'status' => 'NOT_ALLOWED'
-            ], 401);
+                'status' => 'NOT_ALLOWED',
+                'success' => false
+            ]);
         }
 
         $this->validate($request, [
@@ -52,10 +91,11 @@ class AuthController extends Controller
 
     public function login(Request $request, $new = false) {
 
-        if (!$this->isRequestAllowedToProceed($request)) {
+        if (!$this->isRequestAllowedToProceed($request->server('HTTP_USER_AGENT'))) {
             return response()->json([
-                'status' => 'NOT_ALLOWED'
-            ], 401);
+                'status' => 'NOT_ALLOWED',
+                'success' => false
+            ]);
         }
 
 
@@ -73,7 +113,8 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => '404',
-                'code' => 'INVALID_USERNAME'
+                'code' => 'INVALID_USERNAME',
+                'success' => false
             ]);
         }
 
@@ -82,7 +123,8 @@ class AuthController extends Controller
         if (!Hash::check($request->get('password'), $password)) {
             return response()->json([
                 'status' => '404',
-                'code' => 'INVALID_PASSWORD'
+                'code' => 'INVALID_PASSWORD',
+                'success' => false
             ]);
         }
 
@@ -93,17 +135,9 @@ class AuthController extends Controller
             'access_token' => $token,
             'name' => $user->name,
             'username' => $user->username,
-            'new' => $new
+            'new' => $new,
+            'success' => true
         ]);
 
     }
-
-    private function isRequestAllowedToProceed(Request $request) {
-        if ($request->server('HTTP_USER_AGENT') === 'MemoryTest') {
-            return true;
-        }
-
-        return true;
-    }
-
 }
