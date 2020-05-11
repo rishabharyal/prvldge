@@ -36,4 +36,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
+
+    public function friendIdList(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserFriends::class);
+    }
+
+    public function postDates(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(FeedDates::class);
+    }
 }
