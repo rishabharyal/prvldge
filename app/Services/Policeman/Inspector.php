@@ -9,8 +9,9 @@ trait Inspector
 {
 	public function createToken($permissions = ['*'])
 	{
-        return $this->tokens()->create([
-            'token' => (new Token($this->getKey()))->generateToken(),
+	    $token = (new Token($this->getKey()))->generateToken();
+        $this->tokens()->create([
+            'token' => $token,
             'ip_address' => Detect::ip(),
             'device_name' => Detect::platform()['device_name'] ?? 'N/A',
             'metadata' => [
@@ -20,6 +21,8 @@ trait Inspector
             'permissions' => $permissions,
             'user_id' => $this->getKey()
         ]);
+
+        return $token;
 	}
 
 	public function tokens()

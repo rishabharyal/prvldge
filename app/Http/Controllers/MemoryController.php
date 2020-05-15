@@ -54,6 +54,9 @@ class MemoryController extends Controller
         $memory->type = $request->get('image') ?? 'image';
         $memory->save();
 
+        // 1. store locally
+        // 2. store date in feed_dates ['', '', '', '', '', '']
+
         // Now save the image to amazon S3, get URL and save it.
 
         return response()->json($memory, 201);

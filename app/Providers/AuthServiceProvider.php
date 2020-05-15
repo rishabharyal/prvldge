@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Policeman\AccessToken;
 use App\Traits\NormallyUsedMethods;
 use App\User;
 use Illuminate\Support\Facades\Gate;
@@ -31,7 +32,11 @@ class AuthServiceProvider extends ServiceProvider
         $this->app['auth']->viaRequest('api', static function ($request) {
             if ($request->header('Authorization')) {
                 $key = explode(' ',$request->header('Authorization'));
-                return User::where('access_token', $key[1])->first();
+                $accessToken = AccessToken::where('token', $key)->first();
+                if (!$accessToken) {
+                    return null;
+                }
+                return $accessToken->user;
             }
         });
 

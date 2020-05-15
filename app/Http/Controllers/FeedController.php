@@ -36,7 +36,7 @@ class FeedController extends Controller
             ]);
         }
 
-        $friendList = Auth::user()->friendIdList;
+        $friendList = Auth::user()->friendIdList; // for this we will use Cache later
 
         // Yes it does not look safe & optimized, because we will implement GraphQL instead of JSON API response...
         $feeds = $this->memoryModel->whereIn('user_id', $friendList)
@@ -62,8 +62,8 @@ class FeedController extends Controller
      * user's friends
      */
     public function getFeedDates() {
-        $friendList = Auth::user()->friendIdList;
-        $dates = FeedDates::whereIn('user_id', $friendList)->get();
+        $friendList = Auth::user()->friendIdList; // for this we will use Cache later
+        $dates = FeedDates::whereIn('user_id', $friendList)->get(); // for this we will use Cache later
 
         $responseDate = [];
         foreach ($dates as $date) {
