@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\File;
+use App\FeedDates;
 use App\Memory;
+use App\MemoryAttachment;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +26,7 @@ class MemoryController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => 'USER_NOT_FOUND'
-            ], 404);
+            ], 403);
         }
 
         if (!Gate::allows('list-memories', $user)) {
@@ -38,7 +41,7 @@ class MemoryController extends Controller
 
     }
 
-    public function store(Request $request) {
+    public function store(Request $request, File $file) {
         $this->validate($request, [
             'caption' => 'required|max:60',
             'photo' => 'require|image',
@@ -46,7 +49,7 @@ class MemoryController extends Controller
             'date' => 'required|date'
         ]);
 
-        $memory = new Memory();
+        $memory = new Memory(); // need is_persisted column in memories table, because sometime data is saved but not attachment...
         $memory->user_id = Auth::id();
         $memory->caption = $request->get('caption');
         $memory->visibility = $request->get('visibility') ?? 0;
@@ -54,10 +57,27 @@ class MemoryController extends Controller
         $memory->type = $request->get('image') ?? 'image';
         $memory->save();
 
-        // 1. store locally
-        // 2. store date in feed_dates ['', '', '', '', '', '']
+        $fileInfo = $file->save(); // This either returns StructFile or exception..
 
-        // Now save the image to amazon S3, get URL and save it.
+        MemoryAttachment::create([
+            'memory_id' => $memory->id,
+            'file_url' => $fileInfo->url,
+            'type' => $fileInfo->type,
+            'storage' => $fileInfo->storage
+        ]);
+
+        // Add to FeeDDates table..
+        $postId = ",{$memory->id}";
+
+        $latestFeedDate = Auth::user()->postDates()->latest()->first();
+        if (!$latestFeedDate) {
+            $latestFeedDate = new FeedDates();
+            $latestFeedDate->user_id = Auth::id();
+            $postId = $memory->id;
+        }
+
+        $latestFeedDate->post_dates .= $postId;
+        $latestFeedDate->save();
 
         return response()->json($memory, 201);
 
