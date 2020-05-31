@@ -32,7 +32,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->app['auth']->viaRequest('api', static function ($request) {
             if ($request->header('Authorization')) {
                 $key = explode(' ',$request->header('Authorization'));
-                $accessToken = AccessToken::where('token', $key)->first();
+                $accessToken = AccessToken::where('token', $key[1])->first();
                 if (!$accessToken) {
                     return null;
                 }
