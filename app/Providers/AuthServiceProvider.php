@@ -34,7 +34,7 @@ class AuthServiceProvider extends ServiceProvider
                 $key = explode(' ',$request->header('Authorization'));
                 $accessToken = AccessToken::where('token', $key[1])->first();
                 if (!$accessToken) {
-                    return null;
+                    return null; // return unauthorized
                 }
                 return $accessToken->user;
             }

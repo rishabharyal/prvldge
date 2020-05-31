@@ -9,6 +9,7 @@ trait NormallyUsedMethods {
     /**
      * @param null $agent
      * @return bool
+     * // here...
      */
     private function isRequestAllowedToProceed($agent = null): bool
     {
