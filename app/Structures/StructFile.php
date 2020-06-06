@@ -14,7 +14,7 @@ class StructFile
     public bool $exists = false; // if file exists or is only an instance
 
 
-    public function __construct($name, $storage, $extension, $mime, $exists)
+    public function __construct($name="", $storage="", $extension="", $mime="", $exists=false)
     {
         $this->name = $name;
         $this->storage = $storage;

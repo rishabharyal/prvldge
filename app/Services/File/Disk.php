@@ -19,7 +19,7 @@ class Disk implements File
 
     public function __construct(StructFile $file)
     {
-        $this->file;
+        $this->file = $file;
     }
 
     public function save($resource)

@@ -6,6 +6,7 @@ use App\Contracts\File;
 use App\FeedDates;
 use App\Memory;
 use App\MemoryAttachment;
+use App\Structures\StructFile;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,8 +57,7 @@ class MemoryController extends Controller
         $memory->memory_at = $request->get('date');
         $memory->type = $request->get('image') ?? 'image';
         $memory->save();
-
-        $fileInfo = $file->save(); // This either returns StructFile or exception..
+        $fileInfo = $file->save($request->get('image')); // This either returns StructFile or exception..
 
         MemoryAttachment::create([
             'memory_id' => $memory->id,
