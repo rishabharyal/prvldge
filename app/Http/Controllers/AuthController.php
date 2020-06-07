@@ -7,22 +7,13 @@ use App\Traits\NormallyUsedMethods;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 
 class AuthController extends Controller
 {
 
     use NormallyUsedMethods;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
 
     public function checkPhone(Request $request) {
         $phone = $request->get('phone_number');
@@ -42,9 +33,9 @@ class AuthController extends Controller
             ]);
         }
 
-        $userWIthGivenPhoneNumber = User::where('phone_number', $phone)->first();
+        $userWithGivenPhoneNumber = User::where('phone_number', "{$code} {$phone}")->first();
 
-        if ($userWIthGivenPhoneNumber) {
+        if ($userWithGivenPhoneNumber) {
             return response()->json([
                 'status' => 'PHONE_NUMBER_ALREADY_EXISTS',
                 'success' => false
@@ -55,7 +46,6 @@ class AuthController extends Controller
             'status' => 'AVAILABLE',
             'success' => true
         ]);
-
     }
 
     public function register(Request $request) {
@@ -67,13 +57,21 @@ class AuthController extends Controller
             ]);
         }
 
-        $this->validate($request, [
-            'username' => 'required|unique:users,username',
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|unique:users,username|regex:/^[a-zA-Z0-9._]+$/',
             'password' => 'required|min:6',
             'name' => 'required',
             'birthday' => 'date|required',
             'gender' => 'required|in:m,f,o'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'status' => 'VALIDATION_FAILED',
+                'data' => $validator->errors()
+            ]);
+        }
 
         $user = new User();
         $user->name = $request->get('name');
@@ -97,13 +95,10 @@ class AuthController extends Controller
             ]);
         }
 
-
         $this->validate($request, [
             'username' => 'required',
             'password' => 'required'
         ]);
-
-        // We only allow user agent from two sources: iOS & Android for now
 
         $username = $request->get('username');
 
@@ -111,8 +106,7 @@ class AuthController extends Controller
 
         if (!$user) {
             return response()->json([
-                'status' => '404',
-                'code' => 'INVALID_USERNAME',
+                'status' => 'INVALID_USERNAME',
                 'success' => false
             ]);
         }
@@ -121,12 +115,10 @@ class AuthController extends Controller
 
         if (!Hash::check($request->get('password'), $password)) {
             return response()->json([
-                'status' => '404',
-                'code' => 'INVALID_PASSWORD',
+                'status' => 'INVALID_PASSWORD',
                 'success' => false
             ]);
         }
-
 
         $token = $user->createToken();
 

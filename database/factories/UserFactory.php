@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Model Factories
@@ -15,5 +14,11 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,
         'email' => $faker->email,
+        'username' => uniqid('user_', true),
+        'password' => app('hash')->make('password'),
+        'country' => 'NP',
+        'phone_number' => $faker->phoneNumber,
+        'birthday' => $faker->date,
+        'gender' => 'm'
     ];
 });

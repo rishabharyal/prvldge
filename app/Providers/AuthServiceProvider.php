@@ -54,7 +54,7 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $post->user_id;
         });
 
-        Gate::define('list-memories', static function($user, $secondUser) {
+        Gate::define('list-memories', function($user, $secondUser) {
             if ($secondUser->id === $user->id) {
                 return true;
             }
@@ -69,7 +69,7 @@ class AuthServiceProvider extends ServiceProvider
 
         });
 
-        Gate::any(['see-memory', 'comment-on-memory', 'like-memory', 'react-on-memory'], static function($user, $post) {
+        Gate::any(['see-memory', 'comment-on-memory', 'like-memory', 'react-on-memory'], function($user, $post) {
             if ($post->user_id === $user->id) {
                 return true;
             }

@@ -13,11 +13,11 @@ trait NormallyUsedMethods {
      */
     private function isRequestAllowedToProceed($agent = null): bool
     {
-        if ($agent === 'MemoryTest') {
+        if ($agent === 'Memory Test' || $agent === 'Memory App') {
             return true;
         }
 
-        return true;
+        return false;
     }
 
 
