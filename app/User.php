@@ -37,13 +37,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password',
     ];
 
-    public function friendIdList(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(UserFriends::class);
+    public function friendIdList(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany(UserFriends::class);
     }
 
-    public function postDates(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
+    public function friends(): \Illuminate\Database\Eloquent\Relations\HasMany {
+	return $this->hasMany(UserRelationships::class, 'follower_id', 'id');
+    }
+	    
+
+    public function postDates(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany(FeedDates::class);
     }
 }

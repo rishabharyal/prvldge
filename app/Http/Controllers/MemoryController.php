@@ -16,29 +16,35 @@ use Illuminate\Support\Facades\Gate;
 class MemoryController extends Controller
 {
     public function index(Request $request) {
-        if (!$request->has('user_id')) {
-            return response()->json([
-                'status' => 'MISSING_USER_ID_PARAM'
-            ], 404);
+	if (!$request->has('user_id')) {
+	    return response()->json([
+		'success' => false,
+            	'status' => 'MISSING_USER_ID_PARAM'
+            ]);
         }
 
         $user = User::find($request->get('user_id'));
 
         if (!$user) {
             return response()->json([
+                'success' => false,
                 'status' => 'USER_NOT_FOUND'
-            ], 403);
+            ]);
         }
 
         if (!Gate::allows('list-memories', $user)) {
             return response()->json([
-                '401' => 'UNAUTHORIZED_ACTION'
-            ], 404);
+                'success' => false,
+                'status' => 'UNAUTHORIZED_ACTION'
+            ]);
         }
 
         $memories = Memory::where('user_id', $user->id)->where('visibility', 1)->paginate(12);
 
-        return response()->json($memories);
+        return response()->json([
+            'success' => true,
+            'data' => $memories
+        ]);
 
     }
 

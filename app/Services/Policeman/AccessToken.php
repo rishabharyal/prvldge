@@ -24,6 +24,7 @@ class AccessToken extends Model {
 	];
 
     protected $primaryKey = 'token';
+    protected $keyType = 'string';
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -25,7 +25,7 @@ trait NormallyUsedMethods {
      * @param $firstId
      * @param $secondId
      * @return bool
-     * Returns if the user with first id has followed the second user with second id
+     * Returns true if both of the friends have added each other
      */
     public function hasOneUserFollowedTheOtherUser($firstId, $secondId): bool
     {

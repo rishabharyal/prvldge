@@ -61,7 +61,7 @@ class AuthServiceProvider extends ServiceProvider
 
             $hasViewerFollowedAuthor = $this->hasOneUserFollowedTheOtherUser($user->id, $secondUser->id);
 
-            if ($hasViewerFollowedAuthor || $secondUser->visibility) {
+            if ($hasViewerFollowedAuthor) {
                 return true;
             }
 
