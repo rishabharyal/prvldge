@@ -13,10 +13,14 @@ class AuthControllerTest extends TestCase
 
     private string $phoneNumber;
     private string $username;
+    private array $headers;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->headers = [
+            'HTTP_USER_AGENT' => 'Memory Test'
+        ];
         $this->phoneNumber = '9865912' . rand(100, 999);
         $this->username = uniqid('user_', true);
         factory(User::class)->create([
@@ -36,7 +40,7 @@ class AuthControllerTest extends TestCase
                 'prefix_code' => '989',
                 'phone_number' => '9865012999'
             ]
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'status' => 'INVALID_PREFIX_CODE',
             'success' => false
         ]);
@@ -51,7 +55,7 @@ class AuthControllerTest extends TestCase
         $this->json('GET', '/phone/check-availability', [
             'prefix_code' => '977',
             'phone_number' => '986501299'
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'status' => 'INVALID_PHONE_NUMBER',
             'success' => false
         ]);
@@ -66,7 +70,7 @@ class AuthControllerTest extends TestCase
         $this->json('GET', '/phone/check-availability', [
             'prefix_code' => '977',
             'phone_number' => $this->phoneNumber
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'status' => 'PHONE_NUMBER_ALREADY_EXISTS',
             'success' => false
         ]);
@@ -81,7 +85,7 @@ class AuthControllerTest extends TestCase
         $this->json('GET', '/phone/check-availability', [
             'prefix_code' => '977',
             'phone_number' => '1234567' . rand(100, 999)
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'status' => 'AVAILABLE',
             'success' => true
         ]);
@@ -111,9 +115,7 @@ class AuthControllerTest extends TestCase
     public function test_register_returns_validation_error_when_passed_with_invalid_data(): void {
         $this->json('POST', '/register', [
             'name' => 'Miniyan Gadha',
-        ], [
-            'HTTP_USER_AGENT' => 'Memory Test'
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'success' => false,
             'status' => 'VALIDATION_FAILED'
         ]);
@@ -131,9 +133,7 @@ class AuthControllerTest extends TestCase
             'name' => 'Miniyan Gadha',
             'birthday' => date('Y-m-d'),
             'gender' => 'm'
-        ], [
-            'HTTP_USER_AGENT' => 'Memory Test'
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'success' => false,
             'status' => 'VALIDATION_FAILED',
             'data' => [
@@ -155,9 +155,7 @@ class AuthControllerTest extends TestCase
             'name' => 'Miniyan Gadha',
             'birthday' => date('Y-m-d'),
             'gender' => 'm'
-        ], [
-            'HTTP_USER_AGENT' => 'Memory Test'
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'success' => true,
             'name' => 'Miniyan Gadha',
             'new' => true,
@@ -188,9 +186,7 @@ class AuthControllerTest extends TestCase
         $this->json('POST', '/login', [
             'username' => $this->username,
             'password' => 'password',
-        ], [
-            'HTTP_USER_AGENT' => 'Memory Test'
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'success' => true,
             'username' => $this->username
         ]);
@@ -205,9 +201,7 @@ class AuthControllerTest extends TestCase
         $this->json('POST', '/login', [
             'username' => $this->username . '_fails',
             'password' => 'password',
-        ], [
-            'HTTP_USER_AGENT' => 'Memory Test'
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'success' => false,
             'status' => 'INVALID_USERNAME'
         ]);
@@ -223,9 +217,7 @@ class AuthControllerTest extends TestCase
         $this->json('POST', '/login', [
             'username' => $this->username,
             'password' => 'wrong-password',
-        ], [
-            'HTTP_USER_AGENT' => 'Memory Test'
-        ])->seeJson([
+        ], $this->headers)->seeJson([
             'success' => false,
             'status' => 'INVALID_PASSWORD'
         ]);

@@ -17,7 +17,7 @@ Route::get('/', function() {
 });
 Route::post('/login', 'AuthController@login');
 Route::post('/register', 'AuthController@register');
-Route::get('/phone/check-availability', 'AuthController@checkPhone');
+Route::get('/phone/check-availability', 'ValidationController@checkPhoneAvailability');
 
 Route::group(['middleware' => 'auth'], static function($router) {
     $router->get('memories', 'MemoryController@index');

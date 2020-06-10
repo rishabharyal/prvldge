@@ -17,9 +17,7 @@ class CreateMemoriesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->string('caption', 160);
-            $table->string('type')->nullable();
             $table->boolean('visibility')->default(0);
-            $table->date('memory_at');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

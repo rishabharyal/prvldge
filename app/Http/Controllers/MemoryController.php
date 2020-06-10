@@ -16,10 +16,10 @@ use Illuminate\Support\Facades\Gate;
 class MemoryController extends Controller
 {
     public function index(Request $request) {
-	if (!$request->has('user_id')) {
-	    return response()->json([
-		'success' => false,
-            	'status' => 'MISSING_USER_ID_PARAM'
+	   if (!$request->has('user_id')) {
+    	    return response()->json([
+    		    'success' => false,
+                'status' => 'MISSING_USER_ID_PARAM'
             ]);
         }
 
@@ -51,17 +51,14 @@ class MemoryController extends Controller
     public function store(Request $request, File $file) {
         $this->validate($request, [
             'caption' => 'required|max:60',
-            'photo' => 'require|image',
-            'visibility' => 'required',
-            'date' => 'required|date'
+            'photo' => 'required|image',
+            'visibility' => 'required'
         ]);
 
         $memory = new Memory(); // need is_persisted column in memories table, because sometime data is saved but not attachment...
         $memory->user_id = Auth::id();
         $memory->caption = $request->get('caption');
         $memory->visibility = $request->get('visibility') ?? 0;
-        $memory->memory_at = $request->get('date');
-        $memory->type = $request->get('image') ?? 'image';
         $memory->save();
         $fileInfo = $file->save($request->get('image')); // This either returns StructFile or exception..
 

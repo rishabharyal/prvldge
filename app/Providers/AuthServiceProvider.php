@@ -70,17 +70,24 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::any(['see-memory', 'comment-on-memory', 'like-memory', 'react-on-memory'], function($user, $post) {
+            // The code needs to be rechecked,,
+            // To see private post, you should be yourself
+            // To see other's posts, you should be friends.
+
+            // The case when authenticated user is the author of post
             if ($post->user_id === $user->id) {
                 return true;
             }
 
+            // If visibility is 0, then no other person can see it
             if (!$post->visibility) {
                 return false;
             }
 
+            // This means the viewer has followed the post's author, at least once
             $hasViewerFollowedAuthor = $this->hasOneUserFollowedTheOtherUser($user->id, $post->user_id);
 
-            if ($hasViewerFollowedAuthor || $post->user->visibility) {
+            if ($hasViewerFollowedAuthor) {
                 return true;
             }
 

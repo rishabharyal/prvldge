@@ -7,21 +7,6 @@ use Illuminate\Http\Request;
 trait NormallyUsedMethods {
 
     /**
-     * @param null $agent
-     * @return bool
-     * // here...
-     */
-    private function isRequestAllowedToProceed($agent = null): bool
-    {
-        if ($agent === 'Memory Test' || $agent === 'Memory App') {
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
      * @param $firstId
      * @param $secondId
      * @return bool

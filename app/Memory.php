@@ -13,6 +13,7 @@ class Memory extends Model
      * @var array
      */
     protected $fillable = [
+        'date',
         'caption',
         'created_at',
         'updated_at'

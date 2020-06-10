@@ -2,11 +2,12 @@
 
 namespace Http\Controllers;
 
-use App\Memory;
-use Illuminate\Support\Facades\Storage;
 use TestCase;
-use App\User;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Http\UploadedFile;
+use App\Memory;
+use App\User;
 
 class MemoryControllerTest extends TestCase
 {
@@ -18,6 +19,8 @@ class MemoryControllerTest extends TestCase
     private $user;
     private $nonFriendUser;
     private $friendUser;
+    private $headers;
+    private $headersWithAuthorization;
 
 
     public function setUp(): void
@@ -27,92 +30,95 @@ class MemoryControllerTest extends TestCase
         $this->nonFriendUser = factory(User::class)->create();
         $this->friendUser = factory(User::class)->create();
         $this->user->friends()->create(['followed_id' => $this->friendUser->id, 'blocked' => 0]);
-        $this->user->createToken();
+        $this->headers = [
+            'HTTP_USER_AGENT' => 'Memory Test'
+        ];
+        $this->headersWithAuthorization = [
+            'HTTP_USER_AGENT' => 'Memory Test',
+            'Authorization' => 'Bearer ' .  $this->user->createToken()
+        ];
         Storage::shouldReceive('put')->andReturn();
     }
 
-    public function test_index_returns_MISSING_USER_ID_PARAM_on_not_passing_user_id()
-    {
-        $this->json('GET', '/memories', [], [
-            'Authorization' => 'Bearer ' . $this->user->tokens()->first()->token
-        ])->seeJson([
-            'success' => false,
-            'status' => 'MISSING_USER_ID_PARAM'
-        ]);
-    }
+   public function test_index_returns_MISSING_USER_ID_PARAM_on_not_passing_user_id()
+   {
+       $this->json('GET', '/memories', [], $this->headersWithAuthorization)
+       ->seeJson([
+           'success' => false,
+           'status' => 'MISSING_USER_ID_PARAM'
+       ]);
+   }
 
-    public function test_index_returns_USER_NOT_FOUND_on_providing_invalid_id()
-    {
-        $this->json('GET', '/memories', ['user_id' => 9999], [
-            'Authorization' => 'Bearer ' . $this->user->tokens()->first()->token
-        ])->seeJson([
-            'success' => false,
-            'status' => 'USER_NOT_FOUND'
-        ]);
-    }
+   public function test_index_returns_USER_NOT_FOUND_on_providing_invalid_id()
+   {
+       $this->json('GET', '/memories', ['user_id' => 9999], $this->headersWithAuthorization)
+       ->seeJson([
+           'success' => false,
+           'status' => 'USER_NOT_FOUND'
+       ]);
+   }
 
-    public function test_index_returns_UNAUTHORIZED_ACTION_on_accessing_non_friend_id()
-    {
-        $this->json('GET', '/memories', ['user_id' => $this->nonFriendUser->id], [
-            'Authorization' => 'Bearer ' . $this->user->tokens()->first()->token
-        ])->seeJson([
-            'success' => false,
-            'status' => 'UNAUTHORIZED_ACTION'
-        ]);
-    }
+   public function test_index_returns_UNAUTHORIZED_ACTION_on_accessing_non_friend_id()
+   {
+       $this->json('GET', '/memories', ['user_id' => $this->nonFriendUser->id], $this->headersWithAuthorization)
+       ->seeJson([
+           'success' => false,
+           'status' => 'UNAUTHORIZED_ACTION'
+       ]);
+   }
 
-    public function test_index_returns_success_on_accessing_own_id()
-    {
-        $this->json('GET', '/memories', ['user_id' => $this->user->id], [
-            'Authorization' => 'Bearer ' . $this->user->tokens()->first()->token
-        ])->seeJson([
-            'success' => true,
-            'data' => []
-        ]);
-    }
+   public function test_index_returns_success_on_accessing_own_id()
+   {
+       $this->json('GET', '/memories', ['user_id' => $this->user->id], $this->headersWithAuthorization)
+       ->seeJson([
+           'success' => true,
+           'data' => []
+       ]);
+   }
 
-    public function test_index_returns_success_on_accessing_friends_id()
-    {
-        $this->json('GET', '/memories', ['user_id' => $this->friendUser->id], [
-            'Authorization' => 'Bearer ' . $this->user->tokens()->first()->token
-        ])->seeJson([
-            'success' => true,
-            'data' => []
-        ]);
-    }
+   public function test_index_returns_success_on_accessing_friends_id()
+   {
+       $this->json('GET', '/memories', ['user_id' => $this->friendUser->id], $this->headersWithAuthorization)
+       ->seeJson([
+           'success' => true,
+           'data' => []
+       ]);
+   }
 
-    public function test_store_requires_a_caption()
-    {
+   public function test_store_requires_a_caption(): void
+   {
+       $memory = factory(Memory::class)->make(['caption' => null]);
 
-        $memories = factory(Memory::class)->make(['caption' => null]);
-        $this->post('/memories', $memories->toArray(),
-            ['Authorization' => 'Bearer ' . $this->user->tokens()->first()->token]
-        )->seeJsonContains(['caption' => ['The caption field is required.']]);
-    }
-    public function test_store_requires_a_date()
-    {
+       $this->post('/memories', $memory->toArray(), $this->headersWithAuthorization)
+           ->seeJsonContains(['caption' => ['The caption field is required.']]);
+   }
 
-        $memories = factory(Memory::class)->make(['date' => null]);
-        $this->post('/memories', $memories->toArray(),
-            ['Authorization' => 'Bearer ' . $this->user->tokens()->first()->token]
-        )->seeJsonContains(['date' => ['The date field is required.']]);
-    }
-    public function test_store_requires_a_visibility()
-    {
+   public function test_store_requires_a_visibility(): void
+   {
+       $memory = factory(Memory::class)->make(['visibility' => null]);
 
-        $memories = factory(Memory::class)->make(['visibility' => null]);
-        $this->post('/memories', $memories->toArray(),
-            ['Authorization' => 'Bearer ' . $this->user->tokens()->first()->token]
-        )->seeJsonContains(['visibility' => ['The visibility field is required.']]);
-    }
+       $this->post('/memories', $memory->toArray(), $this->headersWithAuthorization)
+           ->seeJsonContains(['visibility' => ['The visibility field is required.']]);
+   }
 
-    public function test_store_returns_success_on_memories_created()
-    {
-        $memories = factory(Memory::class)->make();
-        $this->post('/memories', $memories->toArray(),
-            ['Authorization' => 'Bearer ' . $this->user->tokens()->first()->token])->seeStatusCode(201);
+   public function test_store_requires_a_photo(): void
+   {
+       $memory = factory(Memory::class)->make(['photo' => null]);
+        $this->post('/memories', $memory->toArray(), $this->headersWithAuthorization)
+            ->seeJsonContains(['photo' => ['The photo field is required.']]);
+   }
 
+    // public function test_store_returns_success_on_memories_created()
+    // {
+    //      $memory = factory(Memory::class)->make([
+    //          'caption' => 'This is a small test caption',
+    //          'visibility' => 1
+    //      ])->toArray();
+    //      $memory['photo'] = UploadedFile::fake()->image('memory_attachment.jpg');
 
-    }
+    //      $resp = $this->json('POST', '/memories', $memory, $this->headersWithAuthorization)
+    //          ->response->content();
+    //      dd($resp);
+    // }
 
 }
