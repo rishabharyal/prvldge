@@ -22,3 +22,14 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'gender' => 'm'
     ];
 });
+$factory->define(\App\Memory::class, function (Faker\Generator $faker) {
+    return [
+        'user_id' => function () {
+            return factory('App\User')->create()->id;
+        },
+        'caption' => $faker->sentence,
+        'type' => $faker->sentence,
+        'visibility' => $faker->numberBetween(0, 1),
+        'memory_at' => $faker->date('Y-m-d')
+    ];
+});
