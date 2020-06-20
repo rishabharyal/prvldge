@@ -132,7 +132,6 @@ class MemoryController extends Controller
                 'status' => 'MEMORY_NOT_FOUND'
             ], 404);
         }
-
         if (!Gate::allows('delete-memory', $memory)) {
             return response()->json([
                 '401' => 'UNAUTHORIZED_ACTION'

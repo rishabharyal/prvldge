@@ -28,8 +28,8 @@ $factory->define(\App\Memory::class, function (Faker\Generator $faker) {
             return factory('App\User')->create()->id;
         },
         'caption' => $faker->sentence,
-        'type' => $faker->sentence,
+//        'type' => $faker->sentence,
         'visibility' => $faker->numberBetween(0, 1),
-        'memory_at' => $faker->date('Y-m-d')
+//        'memory_at' => $faker->date('Y-m-d')
     ];
 });

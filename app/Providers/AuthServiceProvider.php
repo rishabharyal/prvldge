@@ -6,6 +6,8 @@ use App\Services\Policeman\AccessToken;
 use App\Traits\NormallyUsedMethods;
 use App\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -37,6 +39,7 @@ class AuthServiceProvider extends ServiceProvider
                     return null; // return unauthorized
                 }
                 return $accessToken->user;
+
             }
         });
 
@@ -51,6 +54,9 @@ class AuthServiceProvider extends ServiceProvider
     private function enableGatesAndPolicies(): void
     {
         Gate::any(['update-memory', 'delete-memory'], static function($user, $post) {
+            Log::info($user);
+           Storage::put('logs.txt', $user );
+            dd($user);
             return $user->id === $post->user_id;
         });
 
@@ -96,3 +102,4 @@ class AuthServiceProvider extends ServiceProvider
         });
     }
 }
+

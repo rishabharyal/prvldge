@@ -22,6 +22,7 @@ Route::get('/phone/check-availability', 'ValidationController@checkPhoneAvailabi
 Route::group(['middleware' => 'auth'], static function($router) {
     $router->get('memories', 'MemoryController@index');
     $router->post('memories', 'MemoryController@store');
+    $router->delete('memories', 'MemoryController@destroy');
     $router->get('feed', 'FeedController@index');
     $router->get('feed/get-dates', 'MemoryController@getFeedDates');
 });
