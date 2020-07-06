@@ -53,10 +53,10 @@ class AuthServiceProvider extends ServiceProvider
      */
     private function enableGatesAndPolicies(): void
     {
-        Gate::any(['update-memory', 'delete-memory'], static function($user, $post) {
-            Log::info($user);
-           Storage::put('logs.txt', $user );
-            dd($user);
+        Gate::define('delete-memory', function($user, $post) {
+            return $user->id === $post->user_id;
+        });
+        Gate::define('update-memory', function($user, $post) {
             return $user->id === $post->user_id;
         });
 
@@ -65,6 +65,7 @@ class AuthServiceProvider extends ServiceProvider
                 return true;
             }
 
+            // Replace with has followed each other...
             $hasViewerFollowedAuthor = $this->hasOneUserFollowedTheOtherUser($user->id, $secondUser->id);
 
             if ($hasViewerFollowedAuthor) {
@@ -75,7 +76,7 @@ class AuthServiceProvider extends ServiceProvider
 
         });
 
-        Gate::any(['see-memory', 'comment-on-memory', 'like-memory', 'react-on-memory'], function($user, $post) {
+        Gate::define('see-memory', function($user, $post) {
             // The code needs to be rechecked,,
             // To see private post, you should be yourself
             // To see other's posts, you should be friends.

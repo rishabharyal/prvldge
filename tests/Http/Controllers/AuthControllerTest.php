@@ -35,7 +35,7 @@ class AuthControllerTest extends TestCase
      */
     public function test_checkPhone_returns_INVALID_PREFIX_CODE_on_invaid_prefix_code(): void
     {
-        $this->json('GET', '/phone/check-availability', [
+        $this->json('GET', '/api/phone/check-availability', [
             'data' => [
                 'prefix_code' => '989',
                 'phone_number' => '9865012999'
@@ -52,7 +52,7 @@ class AuthControllerTest extends TestCase
      */
     public function test_checkPhone_returns_INVALID_PHONE_NUMBER_on_invaid_phone_number(): void
     {
-        $this->json('GET', '/phone/check-availability', [
+        $this->json('GET', '/api/phone/check-availability', [
             'prefix_code' => '977',
             'phone_number' => '986501299'
         ], $this->headers)->seeJson([
@@ -67,7 +67,7 @@ class AuthControllerTest extends TestCase
      */
     public function test_checkPhone_returns_PHONE_NUMBER_ALREADY_EXISTS_on_existing_phone_number(): void
     {
-        $this->json('GET', '/phone/check-availability', [
+        $this->json('GET', '/api/phone/check-availability', [
             'prefix_code' => '977',
             'phone_number' => $this->phoneNumber
         ], $this->headers)->seeJson([
@@ -82,7 +82,7 @@ class AuthControllerTest extends TestCase
      */
     public function test_checkPhone_returns_AVAILABLE_on_new_phone_number(): void
     {
-        $this->json('GET', '/phone/check-availability', [
+        $this->json('GET', '/api/phone/check-availability', [
             'prefix_code' => '977',
             'phone_number' => '1234567' . rand(100, 999)
         ], $this->headers)->seeJson([
@@ -96,7 +96,7 @@ class AuthControllerTest extends TestCase
      * so returns NOT_ALLOWED response
      */
     public function test_register_returns_NOT_ALLOWED_when_passed_with_invalid_header(): void {
-        $this->json('POST', '/register', [
+        $this->json('POST', '/api/register', [
             'username' => uniqid('user_', true),
             'password' => 'password',
             'name' => 'Miniyan Gadha',
@@ -113,7 +113,7 @@ class AuthControllerTest extends TestCase
      * validation failed response
      */
     public function test_register_returns_validation_error_when_passed_with_invalid_data(): void {
-        $this->json('POST', '/register', [
+        $this->json('POST', '/api/register', [
             'name' => 'Miniyan Gadha',
         ], $this->headers)->seeJson([
             'success' => false,
@@ -127,7 +127,7 @@ class AuthControllerTest extends TestCase
      */
     public function test_register_returns_validation_error_when_passed_with_invalid_username(): void
     {
-        $this->json('POST', '/register', [
+        $this->json('POST', '/api/register', [
             'username' => uniqid('user!', true),
             'password' => 'password',
             'name' => 'Miniyan Gadha',
@@ -149,7 +149,7 @@ class AuthControllerTest extends TestCase
     public function test_register_returns_success_when_passed_with_all_valid_fields(): void
     {
         $username = uniqid('user_', true);
-        $this->json('POST', '/register', [
+        $this->json('POST', '/api/register', [
             'username' => $username,
             'password' => 'password',
             'name' => 'Miniyan Gadha',
@@ -168,7 +168,7 @@ class AuthControllerTest extends TestCase
      * so returns NOT_ALLOWED response
      */
     public function test_login_returns_NOT_ALLOWED_when_passed_with_invalid_header(): void {
-        $this->json('POST', '/register', [
+        $this->json('POST', '/api/register', [
             'username' => uniqid('user_', true),
             'password' => 'password',
         ])->seeJson([
@@ -183,7 +183,7 @@ class AuthControllerTest extends TestCase
      */
     public function test_login_returns_success_when_passed_with_all_valid_fields(): void
     {
-        $this->json('POST', '/login', [
+        $this->json('POST', '/api/login', [
             'username' => $this->username,
             'password' => 'password',
         ], $this->headers)->seeJson([
@@ -198,7 +198,7 @@ class AuthControllerTest extends TestCase
      */
     public function test_login_returns_INVALID_USERNAME_when_passed_with_invalid_username(): void
     {
-        $this->json('POST', '/login', [
+        $this->json('POST', '/api/login', [
             'username' => $this->username . '_fails',
             'password' => 'password',
         ], $this->headers)->seeJson([
@@ -214,7 +214,7 @@ class AuthControllerTest extends TestCase
     public function test_login_returns_INVALID_PASSWORD_when_passed_with_invalid_password(): void
     {
         $username = uniqid('user_', true);
-        $this->json('POST', '/login', [
+        $this->json('POST', '/api/login', [
             'username' => $this->username,
             'password' => 'wrong-password',
         ], $this->headers)->seeJson([

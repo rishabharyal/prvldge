@@ -11,6 +11,7 @@ class StructFile
     public string $storage;
     public string $extension;
     public string $mime;
+    public string $url;
     public bool $exists = false; // if file exists or is only an instance
 
 

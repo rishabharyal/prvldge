@@ -44,7 +44,7 @@ class MemoryControllerTest extends TestCase
 
     public function test_index_returns_MISSING_USER_ID_PARAM_on_not_passing_user_id()
     {
-        $this->json('GET', '/memories', [], $this->headersWithAuthorization)
+        $this->json('GET', '/api/memories', [], $this->headersWithAuthorization)
             ->seeJson([
                 'success' => false,
                 'status' => 'MISSING_USER_ID_PARAM'
@@ -53,7 +53,7 @@ class MemoryControllerTest extends TestCase
 
     public function test_index_returns_USER_NOT_FOUND_on_providing_invalid_id()
     {
-        $this->json('GET', '/memories', ['user_id' => 9999], $this->headersWithAuthorization)
+        $this->json('GET', '/api/memories', ['user_id' => 9999], $this->headersWithAuthorization)
             ->seeJson([
                 'success' => false,
                 'status' => 'USER_NOT_FOUND'
@@ -62,7 +62,7 @@ class MemoryControllerTest extends TestCase
 
     public function test_index_returns_UNAUTHORIZED_ACTION_on_accessing_non_friend_id()
     {
-        $this->json('GET', '/memories', ['user_id' => $this->nonFriendUser->id], $this->headersWithAuthorization)
+        $this->json('GET', '/api/memories', ['user_id' => $this->nonFriendUser->id], $this->headersWithAuthorization)
             ->seeJson([
                 'success' => false,
                 'status' => 'UNAUTHORIZED_ACTION'
@@ -71,7 +71,7 @@ class MemoryControllerTest extends TestCase
 
     public function test_index_returns_success_on_accessing_own_id()
     {
-        $this->json('GET', '/memories', ['user_id' => $this->user->id], $this->headersWithAuthorization)
+        $this->json('GET', '/api/memories', ['user_id' => $this->user->id], $this->headersWithAuthorization)
             ->seeJson([
                 'success' => true,
                 'data' => []
@@ -80,7 +80,7 @@ class MemoryControllerTest extends TestCase
 
     public function test_index_returns_success_on_accessing_friends_id()
     {
-        $this->json('GET', '/memories', ['user_id' => $this->friendUser->id], $this->headersWithAuthorization)
+        $this->json('GET', '/api/memories', ['user_id' => $this->friendUser->id], $this->headersWithAuthorization)
             ->seeJson([
                 'success' => true,
                 'data' => []
@@ -89,58 +89,69 @@ class MemoryControllerTest extends TestCase
 
     public function test_store_requires_a_caption(): void
     {
-        $memory = factory(Memory::class)->make(['caption' => null]);
+        $memory = factory(Memory::class)->make(['caption' => null])->toArray();
+        $memory['photo'] = UploadedFile::fake()->image('memory_attachment.jpg');
 
-        $this->post('/memories', $memory->toArray(), $this->headersWithAuthorization)
+        $this->post('/api/memories', $memory, $this->headersWithAuthorization)
             ->seeJsonContains(['caption' => ['The caption field is required.']]);
     }
 
     public function test_store_requires_a_visibility(): void
     {
-        $memory = factory(Memory::class)->make(['visibility' => null]);
-
-        $this->post('/memories', $memory->toArray(), $this->headersWithAuthorization)
+        $memory = factory(Memory::class)->make(['visibility' => null])->toArray();
+        $memory['photo'] = UploadedFile::fake()->image('memory_attachment.jpg');
+        $this->json('POST', '/api/memories', $memory, $this->headersWithAuthorization)
             ->seeJsonContains(['visibility' => ['The visibility field is required.']]);
+    }
+
+    public function test_store_requires_a_type(): void
+    {
+        $memory = factory(Memory::class)->make(['type' => null])->toArray();
+        $memory['photo'] = UploadedFile::fake()->image('memory_attachment.jpg');
+        $this->json('POST', '/api/memories', $memory, $this->headersWithAuthorization)
+            ->seeJsonContains(['type' => ['The type field is required.']]);
     }
 
     public function test_store_requires_a_photo(): void
     {
         $memory = factory(Memory::class)->make(['photo' => null]);
-        $this->post('/memories', $memory->toArray(), $this->headersWithAuthorization)
+        $this->post('/api/memories', $memory->toArray(), $this->headersWithAuthorization)
             ->seeJsonContains(['photo' => ['The photo field is required.']]);
     }
 
-//     public function test_store_returns_success_on_memories_created()
-//     {
-//          $memory = factory(Memory::class)->make([
-//              'caption' => 'This is a small test caption',
-//              'visibility' => 1
-//          ])->toArray();
-//          $memory['photo'] = UploadedFile::fake()->image('memory_attachment.jpg');
-////            dd($memory);
-//          $resp = $this->json('POST', '/memories', $memory, $this->headersWithAuthorization)
-//              ->response->content();
-//          dd($resp);
-//     }
+    public function test_store_returns_success_on_memories_created()
+    {
+         $memory = factory(Memory::class)->make()->toArray();
+         $memory['photo'] = UploadedFile::fake()->image('memory_attachment.jpg');
+         $resp = $this->post('/api/memories', $memory, $this->headersWithAuthorization)
+            ->seeJson([
+                'user_id' => $this->user->id,
+                'type' => $memory['type'],
+                'caption' => $memory['caption']
+            ]);
+    }
 
     public function test_destory_returns_unauthorized_on_memories_delete_without_permission()
     {
-        $memory = factory(Memory::class)->make()->toArray();
-        $this->delete('/memories', $memory, $this->headersWithAuthorization)
-            ->seeJson(['401'=>'UNAUTHORIZED_ACTION']);
+        $memory = factory(Memory::class)->create([
+            'user_id' => $this->nonFriendUser->id
+        ]);
+        $this->delete('/api/memories/' . $memory->id, [], $this->headersWithAuthorization)
+            ->seeJson([
+                'success' => 'false',
+                'code' => '401',
+                'action_code' => 'UNAUTHORIZED_ACTION'
+            ]);
     }
 
-    public function test_destroy_returns_success_on_memories_deleted()
-    {
-        $memory = factory(Memory::class)->create()->toArray();
-        $res = $this->json('delete','/memories', $memory, $this->headersWithAuthorization)
-            ->response->getContent();
-        dd($res);
-    }
     public function test_store_returns_success_on_memories_deleted()
     {
-        $memory = factory(Memory::class)->make()->toArray();
-        $this->delete('/memories', $memory, $this->headersWithAuthorization)->seeJson(['success']);
+        $memory = factory(Memory::class)->create([
+            'user_id' => $this->user->id
+        ]);
+        $this->delete('/api/memories/' . $memory->id, [], $this->headersWithAuthorization)->seeJson(
+            ['success' => true]
+        );
     }
 
 }

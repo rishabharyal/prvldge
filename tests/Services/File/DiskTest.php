@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\WithoutMiddleware;
 use TestCase;
+use Illuminate\Http\UploadedFile;
 
 class DiskTest extends TestCase
 {
@@ -33,7 +34,8 @@ class DiskTest extends TestCase
     public function test_save(): void
     {
         $this->actingAs($this->user);
-        $structClass = app(Disk::class)->save('Example content.');
+        $file = UploadedFile::fake()->image('memory_attachment.jpg');
+        $structClass = app(Disk::class)->save($file);
         $this->assertInstanceOf(StructFile::class, $structClass);
     }
 }

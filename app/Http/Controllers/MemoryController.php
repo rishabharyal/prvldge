@@ -52,24 +52,26 @@ class MemoryController extends Controller
         $this->validate($request, [
             'caption' => 'required|max:60',
             'photo' => 'required|image',
-            'visibility' => 'required'
+            'visibility' => 'required|boolean',
+            'type' => 'required'
         ]);
 
         $memory = new Memory(); // need is_persisted column in memories table, because sometime data is saved but not attachment...
         $memory->user_id = Auth::id();
         $memory->caption = $request->get('caption');
+        $memory->type = $request->get('type');
         $memory->visibility = $request->get('visibility') ?? 0;
         $memory->save();
-        $fileInfo = $file->save($request->get('image')); // This either returns StructFile or exception..
+        $fileInfo = $file->save($request->get('photo')); // This either returns StructFile or exception..
 
         MemoryAttachment::create([
             'memory_id' => $memory->id,
             'file_url' => $fileInfo->url,
-            'type' => $fileInfo->type,
+            'type' => $fileInfo->mime,
             'storage' => $fileInfo->storage
         ]);
 
-        // Add to FeeDDates table..
+        // Add to FeedDates table..
         $postId = ",{$memory->id}";
 
         $latestFeedDate = Auth::user()->postDates()->latest()->first();
@@ -112,7 +114,7 @@ class MemoryController extends Controller
             ], 404);
         }
 
-        if (!Gate::allows('see-memory', $memory)) {
+        if (!Gate::allows('update-memory', $memory)) {
             return response()->json([
                 '401' => 'UNAUTHORIZED_ACTION'
             ], 404);
@@ -122,11 +124,12 @@ class MemoryController extends Controller
         $memory->caption = $request->get('caption');
         $memory->save();
 
-        return response()->json('success');
+        return response()->json(['success' => true]);
 
     }
 
-    public function destroy(Memory $memory) {
+    public function destroy($id) {
+        $memory = Memory::find($id);
         if (!$memory) {
             return response()->json([
                 'status' => 'MEMORY_NOT_FOUND'
@@ -134,11 +137,15 @@ class MemoryController extends Controller
         }
         if (!Gate::allows('delete-memory', $memory)) {
             return response()->json([
-                '401' => 'UNAUTHORIZED_ACTION'
+                'success' => 'false',
+                'code' => '401',
+                'action_code' => 'UNAUTHORIZED_ACTION'
             ], 404);
         }
 
         $memory->delete();
-        return response()->json('success');
+        return response()->json([
+            'success' => true
+        ]);
     }
 }

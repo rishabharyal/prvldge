@@ -15,14 +15,22 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function() {
     return view('welcome');
 });
-Route::post('/login', 'AuthController@login');
-Route::post('/register', 'AuthController@register');
-Route::get('/phone/check-availability', 'ValidationController@checkPhoneAvailability');
 
-Route::group(['middleware' => 'auth'], static function($router) {
-    $router->get('memories', 'MemoryController@index');
-    $router->post('memories', 'MemoryController@store');
-    $router->delete('memories', 'MemoryController@destroy');
-    $router->get('feed', 'FeedController@index');
-    $router->get('feed/get-dates', 'MemoryController@getFeedDates');
+Route::group(['middleware' => 'api-header', 'prefix' => 'api'], static function($router) {
+	//Login, register and phone number check
+	$router->post('/login', 'AuthController@login');
+	$router->post('/register', 'AuthController@register');
+	$router->get('/phone/check-availability', 'ValidationController@checkPhoneAvailability');
+
+	$router->group(['middleware' => 'auth'], static function($router) {
+
+		//Memory
+	    $router->get('memories', 'MemoryController@index');
+	    $router->post('memories', 'MemoryController@store');
+	    $router->delete('memories/{id}', 'MemoryController@destroy');
+
+	    //Feed
+	    $router->get('feed', 'FeedController@index');
+	    $router->get('feed/get-dates', 'MemoryController@getFeedDates');
+	});
 });

@@ -16,6 +16,7 @@ class CreateMemoriesTable extends Migration
         Schema::create('memories', static function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
+            $table->string('type', 10);
             $table->string('caption', 160);
             $table->boolean('visibility')->default(0);
             $table->timestamps();

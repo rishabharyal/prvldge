@@ -15,6 +15,7 @@ class Memory extends Model
     protected $fillable = [
         'date',
         'caption',
+        'type',
         'created_at',
         'updated_at'
     ];

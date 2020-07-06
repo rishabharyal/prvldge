@@ -17,7 +17,7 @@ class CreateMemoryAttachmentsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('memory_id');
             $table->text('file_url');
-            $table->tinyInteger('type')->default(0);
+            $table->string('type', 16);
             $table->string('storage', 16);
             $table->timestamps();
 
