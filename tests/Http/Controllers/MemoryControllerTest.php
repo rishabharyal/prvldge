@@ -154,4 +154,36 @@ class MemoryControllerTest extends TestCase
         );
     }
 
+    public function test_show_returns_unauthorized_without_permission()
+    {
+        $memory = factory(Memory::class)->create([
+            'user_id' => $this->nonFriendUser->id
+        ]);
+        $this->post('/api/memories/'. $memory->id, [], $this->headersWithAuthorization)
+            ->seeJson([
+                '401' => 'UNAUTHORIZED_ACTION'
+            ]);
+    }
+
+    public function test_show_returns_success()
+    {
+        $memory = factory(Memory::class)->create([
+            'user_id' => $this->user->id
+        ]);
+        $this->post('/api/memories/'. $memory->id, [], $this->headersWithAuthorization)
+            ->seeStatusCode(201)
+            ->seeJson(['success' => true]);
+    }
+
+    public function test_update_returns_unauthorized_without_permission()
+    {
+        $memory = factory(Memory::class)->create([
+            'user_id' => $this->nonFriendUser->id
+        ]);
+        $this->post('/api/memories/'. $memory->id. '/update', [], $this->headersWithAuthorization)
+            ->seeJson([
+                '401' => 'UNAUTHORIZED_ACTION'
+            ]);
+    }
+
 }
