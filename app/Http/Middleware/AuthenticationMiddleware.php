@@ -19,7 +19,7 @@ class AuthenticationMiddleware
         if (Auth::check()) {
             return $next($request);
         }
-
+        
         return response()->json(['status' => 'UNAUTHORIZED'], 401);
     }
 }

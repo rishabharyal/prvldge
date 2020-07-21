@@ -88,39 +88,48 @@ class MemoryController extends Controller
 
     }
 
-    public function show(Memory $memory) {
-
+    public function show(int $id) {
+        $memory = Memory::find($id);
         if (!$memory) {
             return response()->json([
+                'success' => false,
                 'status' => 'MEMORY_NOT_FOUND'
             ], 404);
         }
 
         if (!Gate::allows('see-memory', $memory)) {
             return response()->json([
-                '401' => 'UNAUTHORIZED_ACTION'
-            ], 404);
+                'success' => false,
+                'status' => 'UNAUTHORIZED_ACTION'
+            ], 401);
         }
 
-
-        return response()->json($memory, 201);
-
+        return response()->json([
+            'success' => true,
+            'data' => $memory
+        ], 200);
     }
 
-    public function update(Memory $memory, Request $request) {
+    public function update(int $id, Request $request) {
+        $memory = Memory::find($id);
         if (!$memory) {
             return response()->json([
+                'success' => false,
                 'status' => 'MEMORY_NOT_FOUND'
             ], 404);
         }
 
         if (!Gate::allows('update-memory', $memory)) {
             return response()->json([
-                '401' => 'UNAUTHORIZED_ACTION'
+                'success' => false,
+                'status' => 'UNAUTHORIZED_ACTION'
             ], 404);
         }
 
-        $memory->memory_at = $request->get('date');
+        $this->validate($request, [
+            'caption' => 'required|max:60'
+        ]);
+
         $memory->caption = $request->get('caption');
         $memory->save();
 
@@ -128,10 +137,12 @@ class MemoryController extends Controller
 
     }
 
-    public function destroy($id) {
+    public function destroy(int $id) {
         $memory = Memory::find($id);
+
         if (!$memory) {
             return response()->json([
+                'success' => false,
                 'status' => 'MEMORY_NOT_FOUND'
             ], 404);
         }
