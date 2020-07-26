@@ -26,10 +26,10 @@ Route::group(['middleware' => 'api-header', 'prefix' => 'api'], static function(
 
 		//Memory
 	    $router->get('memories', 'MemoryController@index');
+	    $router->get('memories/{id}', 'MemoryController@show');
 	    $router->post('memories', 'MemoryController@store');
 	    $router->delete('memories/{id}', 'MemoryController@destroy');
-	    $router->post('memories/{id}', 'MemoryController@show');
-	    $router->post('memories/{id}/update', 'MemoryController@update');
+	    $router->put('memories/{id}', 'MemoryController@update');
 
 	    //Feed
 	    $router->get('feed', 'FeedController@index');

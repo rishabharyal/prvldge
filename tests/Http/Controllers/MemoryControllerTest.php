@@ -33,10 +33,10 @@ class MemoryControllerTest extends TestCase
         $this->friendUser = factory(User::class)->create();
         $this->user->friends()->create(['followed_id' => $this->friendUser->id, 'blocked' => 0]);
         $this->headers = [
-            'HTTP_USER_AGENT' => 'Memory Test'
+            'HTTP_USER_AGENT' => 'Memory App'
         ];
         $this->headersWithAuthorization = [
-            'HTTP_USER_AGENT' => 'Memory Test',
+            'HTTP_USER_AGENT' => 'Memory App',
             'Authorization' => 'Bearer ' . $this->user->createToken()
         ];
         Storage::shouldReceive('put')->andReturn();
@@ -144,7 +144,7 @@ class MemoryControllerTest extends TestCase
             ]);
     }
 
-    public function test_store_returns_success_on_memories_deleted()
+    public function test_destroy_returns_success_on_memories_deleted()
     {
         $memory = factory(Memory::class)->create([
             'user_id' => $this->user->id
@@ -159,9 +159,9 @@ class MemoryControllerTest extends TestCase
         $memory = factory(Memory::class)->create([
             'user_id' => $this->nonFriendUser->id
         ]);
-        $this->post('/api/memories/'. $memory->id, [], $this->headersWithAuthorization)
+        $this->json('GET', '/api/memories/'. $memory->id, [], $this->headersWithAuthorization)
             ->seeJson([
-                '401' => 'UNAUTHORIZED_ACTION'
+                'status' => 'UNAUTHORIZED_ACTION'
             ]);
     }
 
@@ -170,9 +170,11 @@ class MemoryControllerTest extends TestCase
         $memory = factory(Memory::class)->create([
             'user_id' => $this->user->id
         ]);
-        $this->post('/api/memories/'. $memory->id, [], $this->headersWithAuthorization)
-            ->seeStatusCode(201)
-            ->seeJson(['success' => true]);
+        $this->json('GET', '/api/memories/'. $memory->id, [], $this->headersWithAuthorization)
+            ->seeStatusCode(200)
+            ->seeJson([
+                'success' => true
+            ]);
     }
 
     public function test_update_returns_unauthorized_without_permission()
@@ -180,9 +182,20 @@ class MemoryControllerTest extends TestCase
         $memory = factory(Memory::class)->create([
             'user_id' => $this->nonFriendUser->id
         ]);
-        $this->post('/api/memories/'. $memory->id. '/update', [], $this->headersWithAuthorization)
+        $this->put('/api/memories/'. $memory->id, ['caption' => 'New Updated Caption!'], $this->headersWithAuthorization)
             ->seeJson([
-                '401' => 'UNAUTHORIZED_ACTION'
+                'status' => 'UNAUTHORIZED_ACTION'
+            ]);
+    }
+
+    public function test_update_returns_success() {
+        $memory = factory(Memory::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $this->put('/api/memories/'. $memory->id, ['caption' => 'Newly Updated Caption!'], $this->headersWithAuthorization)
+            ->seeJson([
+                'success' => true
             ]);
     }
 
