@@ -31,3 +31,12 @@ $factory->define(\App\Memory::class, function (Faker\Generator $faker) {
         'visibility' => $faker->numberBetween(0, 1),
     ];
 });
+$factory->define(\App\Reply::class, function (Faker\Generator $faker) {
+    return [
+        'user_id' => factory(\App\User::class)->create()->id,
+        'title' => $faker->sentence,
+        'emoji' => $faker->word(),
+        'keywords' => implode(',',$faker->words()),
+        'metadata' => json_encode(array("Peter"=>35, "Ben"=>37, "Joe"=>43))
+    ];
+});
