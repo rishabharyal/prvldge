@@ -104,13 +104,13 @@ class MemoryControllerTest extends TestCase
             ->seeJsonContains(['visibility' => ['The visibility field is required.']]);
     }
 
-    public function test_store_requires_a_type(): void
-    {
-        $memory = factory(Memory::class)->make(['type' => null])->toArray();
-        $memory['photo'] = UploadedFile::fake()->image('memory_attachment.jpg');
-        $this->json('POST', '/api/memories', $memory, $this->headersWithAuthorization)
-            ->seeJsonContains(['type' => ['The type field is required.']]);
-    }
+//    public function test_store_requires_a_type(): void
+//    {
+//        $memory = factory(Memory::class)->make(['type' => null])->toArray();
+//        $memory['photo'] = UploadedFile::fake()->image('memory_attachment.jpg');
+//        $this->json('POST', '/api/memories', $memory, $this->headersWithAuthorization)
+//            ->seeJsonContains(['type' => ['The type field is required.']]);
+//    }
 
     public function test_store_requires_a_photo(): void
     {
@@ -126,7 +126,7 @@ class MemoryControllerTest extends TestCase
          $resp = $this->post('/api/memories', $memory, $this->headersWithAuthorization)
             ->seeJson([
                 'user_id' => $this->user->id,
-                'type' => $memory['type'],
+//                'type' => $memory['type'],
                 'caption' => $memory['caption']
             ]);
     }

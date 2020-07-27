@@ -34,5 +34,9 @@ Route::group(['middleware' => 'api-header', 'prefix' => 'api'], static function(
 	    //Feed
 	    $router->get('feed', 'FeedController@index');
 	    $router->get('feed/get-dates', 'MemoryController@getFeedDates');
+
+	    //Replies
+        $router->get('/replies', 'MemoryRepliesController@index');
+        $router->post('/replies', 'MemoryRepliesController@store');
 	});
 });

@@ -33,7 +33,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->app['auth']->viaRequest('api', static function ($request) {
             if ($request->header('Authorization')) {
-                $key = explode(' ',$request->header('Authorization'));
+                $key = explode(' ', $request->header('Authorization'));
                 $accessToken = AccessToken::where('token', $key[1])->first();
                 if (!$accessToken) {
                     return null; // return unauthorized
@@ -53,14 +53,14 @@ class AuthServiceProvider extends ServiceProvider
      */
     private function enableGatesAndPolicies(): void
     {
-        Gate::define('delete-memory', function($user, $post) {
+        Gate::define('delete-memory', function ($user, $post) {
             return $user->id === $post->user_id;
         });
-        Gate::define('update-memory', function($user, $post) {
+        Gate::define('update-memory', function ($user, $post) {
             return $user->id === $post->user_id;
         });
 
-        Gate::define('list-memories', function($user, $secondUser) {
+        Gate::define('list-memories', function ($user, $secondUser) {
             if ($secondUser->id === $user->id) {
                 return true;
             }
@@ -76,7 +76,7 @@ class AuthServiceProvider extends ServiceProvider
 
         });
 
-        Gate::define('see-memory', function($user, $post) {
+        Gate::define('see-memory', function ($user, $post) {
             // The code needs to be rechecked,,
             // To see private post, you should be yourself
             // To see other's posts, you should be friends.
@@ -100,6 +100,18 @@ class AuthServiceProvider extends ServiceProvider
 
             return false;
 
+        });
+
+        Gate::define('self-post', function ($user, $post) {
+            return $user->id === $post->user_id;
+        });
+        Gate::define('friend-post', function ($user, $post) {
+            if ($user->id === $post->user_id) {
+                return true;
+            }
+            $userIsFriendWithPostAuthor = $this->hasOneUserFollowedTheOtherUser($user->id, $post->user_id);
+            if ($userIsFriendWithPostAuthor) return true;
+            return false;
         });
     }
 }
