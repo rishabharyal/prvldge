@@ -27,4 +27,9 @@ class Memory extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function MemoryReply()
+    {
+        return $this->hasMany(MemoryReply::class);
+    }
 }

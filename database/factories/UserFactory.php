@@ -27,7 +27,6 @@ $factory->define(\App\Memory::class, function (Faker\Generator $faker) {
     return [
         'user_id' => 1,
         'caption' => $faker->sentence(2),
-        'type' => 'photo',
         'visibility' => $faker->numberBetween(0, 1),
     ];
 });
@@ -38,5 +37,15 @@ $factory->define(\App\Reply::class, function (Faker\Generator $faker) {
         'emoji' => $faker->word(),
         'keywords' => implode(',',$faker->words()),
         'metadata' => json_encode(array("Peter"=>35, "Ben"=>37, "Joe"=>43))
+    ];
+});
+
+$factory->define(App\MemoryReply::class, function (Faker\Generator $faker) {
+    return [
+        'user_id' => factory(\App\User::class)->create()->id,
+        'memory_id' => factory(\App\Memory::class)->create()->id,
+        'type' => $faker->word(),
+        'memory_reply_suggestion_id'=> factory(\App\Reply::class)->create()->id,
+        'comment'=> $faker->paragraph()
     ];
 });
