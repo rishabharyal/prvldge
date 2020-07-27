@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-//        $this->call('ReplySeeder');
+        $this->call('MemoryReplySuggestionSeeder');
         $this->call('MemoryRepliesSeeder');
         // $this->call('UsersTableSeeder');
     }
