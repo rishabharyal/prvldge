@@ -77,4 +77,45 @@ class MemoryRepliesControllerTest extends \TestCase
             ->seeJsonContains(['comment'=> ['The comment field is required']]);
     }
 
+    public function test_store_returns_success_on_replies_saved()
+    {
+        $replies = factory(MemoryReply::class)->create()->toArray();
+        $this->json('POST','api/replies', $replies,$this->headersWithAuthorization)
+            ->seeStatusCode(200)
+            ->seeJsonContains(['status'=> true]);
+    }
+
+    public function test_update_requires_comment()
+    {
+        $replies = factory(MemoryReply::class)->make(['comment'=>'updated Comment'])->toArray();
+        $this->json('POST','api/replies'.$this->reply->id,$replies,$this->headersWithAuthorization)
+            ->seeJson(['comment'=> ['The comment field is required']]);
+    }
+
+    public function test_update_throws_missing_id_on_invalid_replies_id()
+    {
+        $replies = factory(MemoryReply::class)->make(['id'=>9999])->toArray();
+        $this->json('POST','api/replies'.$replies->id,$this->headersWithAuthorization)
+            ->seeJsonContains([ 'REPLIES NOT FOUND']);
+    }
+
+    public function test_update_returns_success_on_replies_updated()
+    {
+        $this->json('POST','api/replies'.$this->reply->id, $this->headersWithAuthorization)
+            ->seeJsonContains(['success'=> true]);
+    }
+
+    public function test_delete_requires_valid_replies_id()
+    {
+        $replies = factory(MemoryReply::class)->make(['id'=>9999])->toArray();
+        $this->json('DELETE','api/replies'.$replies->id,$this->headersWithAuthorization)
+            ->seeJsonContains([ 'REPLIES NOT FOUND']);
+    }
+
+    public function test_delete_returns_success_on_replies_deleted()
+    {
+        $this->json('DELETE','api/replies'.$this->reply->id,$this->headersWithAuthorization)
+            ->seeJsonContains(['success'=>true]);
+    }
+
 }

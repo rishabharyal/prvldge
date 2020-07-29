@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 
 use App\MemoryReply;
+use App\Services\Validation\Phone;
 use App\User;
 use http\Env\Request;
 use Illuminate\Auth\Access\Gate;
@@ -62,6 +63,54 @@ class MemoryRepliesController extends Controller
             'success'=> true,
             'data' => $replies
         ]);
+    }
+
+    public function update(Request $request,$id)
+    {
+        $validator = Validator::make($request->only(['comment']), [
+            'comment' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'success' => false,
+                'status' => 'VALIDATION_FAILED',
+                'data' => $validator->errors()
+            ];
+        }
+        $replies = MemoryReply::findorfail($id);
+        if(!$replies){
+            return [
+                'success'=> false,
+                'REPLIES NOT FOUND'
+            ];
+        }
+        $replies->comment = $request->get('commnet');
+        $replies->save();
+
+        return response()->json([
+            'success'=> true,
+            'data' => $replies
+        ]);
+
+    }
+
+    public function delete($id)
+    {
+        $reply = MemoryReply::find($id);
+        if(!$reply)
+        {
+            return [
+                'success'=> false,
+                'REPLY NOT FOUND'
+            ];
+        }
+        $reply->delete();
+        return response()->json([
+            'success' => true,
+            'Reply Deleted!!'
+        ]);
+
     }
 
 

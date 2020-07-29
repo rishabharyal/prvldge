@@ -38,5 +38,7 @@ Route::group(['middleware' => 'api-header', 'prefix' => 'api'], static function(
 	    //Replies
         $router->get('/replies', 'MemoryRepliesController@index');
         $router->post('/replies', 'MemoryRepliesController@store');
+        $router->post('/replies{id}', 'MemoryRepliesController@update');
+        $router->delete('/replies{id}', 'MemoryRepliesController@delete');
 	});
 });
