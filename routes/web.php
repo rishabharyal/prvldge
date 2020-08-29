@@ -20,7 +20,7 @@ Route::group(['middleware' => 'api-header', 'prefix' => 'api'], static function(
 	//Login, register and phone number check
 	$router->post('/login', 'AuthController@login');
 	$router->post('/register', 'AuthController@register');
-	$router->get('/phone/check-availability', 'ValidationController@checkPhoneAvailability');
+	$router->post('/phone/check-availability', 'ValidationController@checkPhoneAvailability');
 
 	$router->group(['middleware' => 'auth'], static function($router) {
 
