@@ -187,8 +187,7 @@ class AuthControllerTest extends TestCase
             'username' => $this->username,
             'password' => 'password',
         ], $this->headers)->seeJson([
-            'success' => true,
-            'username' => $this->username
+            'success' => true
         ]);
     }
 

@@ -49,10 +49,13 @@ class Authentication {
         $token = $user->createToken();
 
         return [
-            'access_token' => $token,
-            'name' => $user->name,
-            'username' => $user->username,
-            'success' => true
+            'success' => true,
+            'status' => 'LOGIN_SUCCESS',
+            'data' => [
+                'access_token' => $token,
+                'name' => $user->name,
+                'username' => $user->username
+            ]
         ];
 	}
 
