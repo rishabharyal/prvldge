@@ -24,6 +24,10 @@ Route::group(['middleware' => 'api-header', 'prefix' => 'api'], static function(
 
 	$router->group(['middleware' => 'auth'], static function($router) {
 
+		//Otp
+		$router->post('/phone/send-otp', 'OTPController@send');
+		$router->post('/phone/verify-otp', 'OTPController@verify');
+
 		//Memory
 	    $router->get('memories', 'MemoryController@index');
 	    $router->get('memories/{id}', 'MemoryController@show');

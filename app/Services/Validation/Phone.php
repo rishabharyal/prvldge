@@ -34,8 +34,11 @@ class Phone implements Validation {
         }
 
         return [
+            'success' => true,
             'status' => 'AVAILABLE',
-            'success' => true
+            'data' => [
+                'message' => 'The phone number is available, and can be used.',
+            ]
         ];
 
 	}
