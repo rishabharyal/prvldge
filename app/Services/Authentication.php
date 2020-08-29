@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\NormallyUsedMethods;
 
@@ -58,6 +59,22 @@ class Authentication {
             ]
         ];
 	}
+
+    public function getUser() {
+        $user = Auth::user();
+        return [
+            'success' => true,
+            'code' => 'USER_INFO',
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'birthday' => $user->birthday,
+                'gender' => $user->gender,
+                'is_phone_verified' => $user->is_phone_verified
+            ]
+        ];
+    }
 
 	public function register(array $params): array
     {

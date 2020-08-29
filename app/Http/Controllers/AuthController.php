@@ -20,4 +20,8 @@ class AuthController extends Controller
     public function login(Request $request) {
     	return response()->json($this->authenticationService->login($request->only(['username', 'password'])));
     }
+
+    public function user() {
+        return response()->json($this->authenticationService->getUser());
+    }
 }
