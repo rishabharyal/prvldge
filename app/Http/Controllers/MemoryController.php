@@ -35,11 +35,11 @@ class MemoryController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return [
+            return response()->json([
                 'success' => false,
                 'status' => 'VALIDATION_FAILED',
                 'data' => $validator->errors()
-            ];
+            ]);
         }
 
         return response()->json($this->memory->create(

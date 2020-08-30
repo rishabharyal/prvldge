@@ -31,7 +31,7 @@ class Disk implements File
         $this->file->exists = true;
         $this->file->mime = 'image/jpeg';
         $this->file->extension = 'jpg';
-        $this->file->url = url('/images/' . $this->file->name);
+        $this->file->url = storage_path('/images/' . $this->file->name);
         
         return $this->file;
     }
