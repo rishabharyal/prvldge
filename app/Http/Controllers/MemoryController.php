@@ -29,7 +29,7 @@ class MemoryController extends Controller
     public function store(Request $request, File $file) {
         $validator = Validator::make($request->only(['caption', 'photo', 'visibility', 'type']), [
             'caption' => 'required|max:60',
-            'photo' => 'required|image',
+            'photo' => 'required',
             'visibility' => 'required|boolean',
             'type' => 'required'
         ]);

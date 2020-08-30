@@ -96,24 +96,5 @@ class Friend {
             'status' => 'ALREADY_FRIENDS',
             'success' => true
         ];
-
-
-
 	}
-
-    public function getUser() {
-        $user = Auth::user();
-        return [
-            'success' => true,
-            'code' => 'USER_INFO',
-            'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'username' => $user->username,
-                'birthday' => $user->birthday,
-                'gender' => $user->gender,
-                'is_phone_verified' => $user->is_phone_verified
-            ]
-        ];
-    }
 }

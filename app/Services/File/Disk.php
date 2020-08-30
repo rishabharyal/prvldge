@@ -25,12 +25,12 @@ class Disk implements File
 
     public function save($resource): StructFile
     {
-        $this->file->name = 'file_' . uniqid(md5(Auth::id()) . '_' . time(), true) . '.' .$resource->extension();
-        $storage = Storage::put('images/' . $this->file->name, $resource);
+        $this->file->name = 'file_' . uniqid(md5(Auth::id()) . '_' . time(), true) . '.jpg';
+        $storage = Storage::put('images/' . $this->file->name, base64_decode($resource));
 
         $this->file->exists = true;
-        $this->file->mime = $resource->getClientMimeType();
-        $this->file->extension = $resource->extension();
+        $this->file->mime = 'image/jpeg';
+        $this->file->extension = 'jpg';
         $this->file->url = url('/images/' . $this->file->name);
         
         return $this->file;
