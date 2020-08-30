@@ -13,7 +13,6 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function() {
-	dd(storage_path('app/images'));
     return view('welcome');
 });
 
