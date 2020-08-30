@@ -80,7 +80,7 @@ class Memory {
             'caption' => $memory->caption,
             'type' => $memory->type,
             'visibility' => $memory->visibility,
-            'attachment_url' = $fileInfo->url
+            'attachment_url' => $fileInfo->url
         ];
     }
 
