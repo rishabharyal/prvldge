@@ -5,6 +5,7 @@ namespace App\Services;
 use App\User;
 use App\FollowRequest;
 use App\UserRelationships;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\NormallyUsedMethods;
@@ -41,9 +42,9 @@ class Friend {
         $toBeFriendId = $user->id;
 
         $haveIAlreadySentRequest = $this->hasFirstUserSentRequestToSecond($currentUserId, $toBeFriendId);
-        if ($haveISentRequest) {
+        if ($haveIAlreadySentRequest) {
             return [
-                'status' => success,
+                'success' => true,
                 'status' => 'REQUEST_ALREADY_SENT'
             ];
         }
@@ -55,12 +56,17 @@ class Friend {
             [$firstId, $secondId] = $this->arrangeUserId($currentUserId, $toBeFriendId);
             $relationship = new UserRelationships();
             $relationship->follower_id = $firstId;
-            $relationship->secondId = $secondId;
+            $relationship->followed_id = $secondId;
             $relationship->has_blocked = 0;
             $relationship->save();
 
+            DB::table('follow_requests')
+                ->where('follower_id', $toBeFriendId)
+                ->where('followed_id', $currentUserId)
+                ->delete();
+
             return [
-                'status' => success,
+                'success' => true,
                 'status' => 'USER_ADDED_AS_FRIEND'
             ];
         }
@@ -73,13 +79,13 @@ class Friend {
             $followRequest->save();
 
             return [
-                'status' => success,
+                'success' => true,
                 'status' => 'REQUEST_SENT'
             ];
 
         }
 
-        if ($userRelationship->is_blocked) {
+        if ($userRelationship->has_blocked) {
             return [
                 'status' => 'INVALID_USERNAME',
                 'success' => false
@@ -110,36 +116,4 @@ class Friend {
             ]
         ];
     }
-
-	public function register(array $params): array
-    {
-        $validator = Validator::make($params, [
-            'username' => 'required|unique:users,username|regex:/^[a-zA-Z0-9._]+$/',
-            'password' => 'required|min:6',
-            'name' => 'required',
-            'birthday' => 'date|required',
-            'gender' => 'required|in:m,f,o'
-        ]);
-
-        if ($validator->fails()) {
-            return [
-                'success' => false,
-                'status' => 'VALIDATION_FAILED',
-                'data' => $validator->errors()
-            ];
-        }
-
-        $params['password'] = Hash::make($params['password']);
-        $user = User::create($params);
-
-        return [
-            'data' => [
-            	'access_token' => $user->createToken(),
-	            'name' => $user->name,
-	            'username' => $user->username,
-	            'new' => true,
-            ],
-            'success' => true
-        ];
-	}
 }

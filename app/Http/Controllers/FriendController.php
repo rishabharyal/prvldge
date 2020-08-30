@@ -14,6 +14,6 @@ class FriendController extends Controller
 	}
 
     public function add(Request $request) {
-    	return response()->json($this->friendService->register($request->only(['username'])));
+    	return response()->json($this->friendService->add($request->only(['username'])));
     }
 }

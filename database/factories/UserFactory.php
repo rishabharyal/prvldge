@@ -15,11 +15,12 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'name' => $faker->name,
         'email' => $faker->email,
         'username' => uniqid('user_', true),
-        'password' => app('hash')->make('password'),
+        'password' => app('hash')->make('12345678'),
         'country' => 'NP',
         'phone_number' => $faker->phoneNumber,
         'birthday' => $faker->date,
-        'gender' => 'm'
+        'gender' => 'm',
+        'is_phone_verified' => 1
     ];
 });
 
@@ -30,6 +31,7 @@ $factory->define(\App\Memory::class, function (Faker\Generator $faker) {
         'visibility' => $faker->numberBetween(0, 1),
     ];
 });
+
 $factory->define(\App\MemoryReplySuggestion::class, function (Faker\Generator $faker) {
     return [
         'user_id' => factory(\App\User::class)->create()->id,

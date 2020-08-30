@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserFriends extends Model
+class FollowRequest extends Model
 {
 
     protected $table = 'follow_requests';

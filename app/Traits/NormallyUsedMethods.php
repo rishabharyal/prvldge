@@ -2,6 +2,7 @@
 namespace App\Traits;
 
 use App\UserRelationships;
+use App\FollowRequest;
 use Illuminate\Http\Request;
 
 trait NormallyUsedMethods {
@@ -13,7 +14,7 @@ trait NormallyUsedMethods {
      * @return bool
      * Returns UserRelationships instance if they are already related
      */
-    public function areTheseUsersRelated($firstId, $secondId): ?UserRelationships
+    public function getUserRelationToOtherUser($firstId, $secondId): ?UserRelationships
     {
         list($firstId, $secondId) = $this->arrangeUserId($firstId, $secondId);
         return UserRelationships::where('follower_id', $firstId)
@@ -50,7 +51,7 @@ trait NormallyUsedMethods {
      */
     public function hasFirstUserSentRequestToSecond($firstId, $secondId): bool
     {
-        $relation = UserRelationships::where('follower_id', $firstId)
+        $relation = FollowRequest::where('follower_id', $firstId)
             ->where('followed_id', $secondId)
             ->first();
 
