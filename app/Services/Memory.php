@@ -55,7 +55,7 @@ class Memory {
         $memory->save();
         $fileInfo = $file->save($photo); // This either returns StructFile or exception..
 
-        MemoryAttachment::create([
+        $attachment = MemoryAttachment::create([
             'memory_id' => $memory->id,
             'file_url' => $fileInfo->url,
             'type' => $fileInfo->mime,
@@ -75,23 +75,29 @@ class Memory {
         $latestFeedDate->post_dates .= $postId;
         $latestFeedDate->save();
 
-        return $memory;
+        return [
+            'id' => $memory->id,
+            'caption' => $memory->caption,
+            'type' => $memory->type,
+            'visibility' => $memory->visibility,
+            'attachment_url' = $fileInfo->url
+        ];
     }
 
     public function update($id, $caption) {
         $memory = \App\Memory::find($id);
         if (!$memory) {
-            return response()->json([
+            return [
                 'success' => false,
                 'status' => 'MEMORY_NOT_FOUND'
-            ], 404);
+            ];
         }
 
         if (!Gate::allows('update-memory', $memory)) {
-            return response()->json([
+            return [
                 'success' => false,
                 'status' => 'UNAUTHORIZED_ACTION'
-            ], 404);
+            ];
         }
 
         $memory->caption = $caption;
