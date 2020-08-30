@@ -52,6 +52,7 @@ class MemoryRepliesController extends Controller
                 'data' => $validator->errors()
             ];
         }
+        
         $replies = new MemoryReply();
         $replies->user_id = $userId;
         $replies->memory_id = $request->get('memory_id');

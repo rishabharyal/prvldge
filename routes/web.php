@@ -24,11 +24,15 @@ Route::group(['middleware' => 'api-header', 'prefix' => 'api'], static function(
 
 	$router->group(['middleware' => 'auth'], static function($router) {
 
+		//User Info
 		$router->get('/me', 'AuthController@user');
 
 		//Otp
 		$router->post('/phone/send-otp', 'OTPController@send');
 		$router->post('/phone/verify-otp', 'OTPController@verify');
+
+		//Friends
+		$router->post('/friend/add', 'FriendController@add');
 
 		//Memory
 	    $router->get('memories', 'MemoryController@index');

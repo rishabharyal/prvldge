@@ -21,6 +21,6 @@ class ClientMiddleware
             return $next($request);
         }
 
-        return response()->json(['success' => false, 'status' => 'NOT_ALLOWED']);
+        return response()->json(['success' => false, 'status' => 'NOT_ALLOWED' . $request->server('HTTP_USER_AGENT')]);
     }
 }
