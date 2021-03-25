@@ -21,8 +21,8 @@ class MemoryControllerTest extends TestCase
     private $user;
     private $nonFriendUser;
     private $friendUser;
-    private $headers;
-    private $headersWithAuthorization;
+    private array $headers;
+    private array $headersWithAuthorization;
 
 
     public function setUp(): void
