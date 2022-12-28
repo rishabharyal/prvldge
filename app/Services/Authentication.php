@@ -55,7 +55,8 @@ class Authentication {
             'data' => [
                 'access_token' => $token,
                 'name' => $user->name,
-                'username' => $user->username
+                'username' => $user->username,
+                'is_phone_verified' => $user->is_phone_verified
             ]
         ];
 	}

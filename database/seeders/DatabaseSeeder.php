@@ -1,5 +1,8 @@
 <?php
 
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,8 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call('MemoryReplySuggestionSeeder');
-        // $this->call('MemoryRepliesSeeder');
-        $this->call('UsersTableSeeder');
+         $this->call('UsersTableSeeder');
     }
 }
