@@ -5,8 +5,11 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^8.0",
-        "laravel/lumen-framework": "^9.0"
+        "php": ">=8.0",
+        "illuminate/redis": "^9.45",
+        "laravel/lumen-framework": "^9.0",
+        "league/flysystem-aws-s3-v3": "^3.10",
+        "predis/predis": "^2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
